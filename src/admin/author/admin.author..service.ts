@@ -42,7 +42,12 @@ export class AuthorService {
                 currentId = result[i].id
             }
             if (result[i].bookId) {
-                book = await this.bookRepository.findOne({ id: result[i].bookId })
+                try {
+                    
+                    book = await this.bookRepository.findOne({ id: result[i].bookId })
+                } catch (error) {
+                    console.log(error)
+                }
                 books.push(book)
             }
             currentAuthor = {
@@ -54,7 +59,7 @@ export class AuthorService {
         }
         return authors;
     }
-
+    
     async getAllAuthors(): Promise<AuthorEntity[]> {
         const result = await this.repository.query('SELECT * FROM author')
         return result

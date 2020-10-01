@@ -19,7 +19,7 @@ export class AdminBooksController {
     @UseGuards(JWTAuthGuard)
     async getBooks(@Body() filter: BaseFilter) {
         const data = await this.service.GetBooks(filter)
-        return {data: data, count: data.lenght}
+        return {data: data, count: data.length}
     }
 
 } 

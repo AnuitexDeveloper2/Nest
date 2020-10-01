@@ -1,4 +1,4 @@
-import { Currency } from "src/shared/enums";
+import { Category, Currency } from "src/shared/enums";
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
 import { AuthorEntity } from "./author.entity";
 import { AuthorInBook } from "./authorInBook.entity";
@@ -23,6 +23,6 @@ export class BookEntity extends BaseEntity {
     currency: Currency
 
     @OneToMany(()=> AuthorInBook, b=> b.bookId)
-    authors: Promise<AuthorEntity[]>
+    authors: AuthorEntity[]
 
 }

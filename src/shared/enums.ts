@@ -13,6 +13,12 @@ export enum Currency {
     UAH = 5
 }
 
+export enum Category {
+    Book = 0,
+    Newspaper = 1,
+    Category = 2
+}
+
 export enum SortType {
     None = 0,
     Asc = 1,
