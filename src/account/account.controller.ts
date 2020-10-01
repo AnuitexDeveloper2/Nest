@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Post, Req } from '@nestjs/common';
 import { AccountService } from './account.service';
-// import { UserDTO } from '../dto/createUserDTO';
 import { JWTStrategy } from './authentication/jwtStrategy';
 import { Request, Response } from 'express';
 @Controller('auth')
@@ -9,7 +8,6 @@ export class AccountController {
 
   @Post('register')
   async Register(@Body() user: any) {
-    // return await this.service.Create(user.user)           mongoose 
     return await this.service.CreateORM(user.user)
   }
 

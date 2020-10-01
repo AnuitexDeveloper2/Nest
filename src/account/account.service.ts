@@ -11,12 +11,12 @@ import { LocalStrategy } from './authentication/local.strategy';
 import { JWTStrategy } from './authentication/jwtStrategy';
 import { MyLogger } from 'src/shared/logger/logger';
 import { json } from 'express';
+import { Role } from 'src/shared/enums';
 
 @Injectable()
 export class AccountService {
     private result: ResponseModel
     constructor(
-        // @InjectModel('User') private readonly userModel: Model<User>,
         @InjectRepository(UserEntity) private readonly repository: Repository<UserEntity>,
         private readonly logger: MyLogger,
         private readonly localStrategy: LocalStrategy,
@@ -51,12 +51,12 @@ export class AccountService {
 
     async signInORM(email: string, password: string) {
         this.logger.log(`signInORM with params email = ${email} password = ${password}`)
+        
         const validate = await this.localStrategy.validate(email, password)
         if (!validate.user) {
 
         }
         const response = this.jwtStrategy.GenerateTokens(validate)
-
         return response
     }
 
