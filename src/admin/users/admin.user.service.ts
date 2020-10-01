@@ -11,7 +11,6 @@ export class AdminUserService {
     ) { }
 
     async GetUsers(filter: UserFilter) {
-        console.log('We are here')
        const res = await this.repository.query(`SELECT * FROM user WHERE user.role <> 0 `);
        return await res
     }

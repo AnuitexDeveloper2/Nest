@@ -10,7 +10,6 @@ export class AdminUserController {
     @Post('user')
     @UseGuards(JWTAuthGuard)
     async GetUser(@Body() filter: UserFilter) {
-        console.log(filter)
         const result = await this.service.GetUsers(filter)
        return {data: result, count:result.length}
     }

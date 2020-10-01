@@ -43,10 +43,9 @@ export class AuthorService {
             }
             if (result[i].bookId) {
                 try {
-                    
+
                     book = await this.bookRepository.findOne({ id: result[i].bookId })
                 } catch (error) {
-                    console.log(error)
                 }
                 books.push(book)
             }
@@ -56,10 +55,13 @@ export class AuthorService {
                 books: books,
                 removed_at: result[i].removed_at
             }
+            if (i === result.length - 1) {
+                authors.push(currentAuthor)
+            }
         }
         return authors;
     }
-    
+
     async getAllAuthors(): Promise<AuthorEntity[]> {
         const result = await this.repository.query('SELECT * FROM author')
         return result

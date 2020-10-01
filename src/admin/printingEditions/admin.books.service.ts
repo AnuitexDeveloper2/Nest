@@ -32,37 +32,57 @@ export class BookService {
         return true
     }
 
-    async GetBooks(filter: BaseFilter) {
+    async GetBooks(filter: BaseFilter): Promise<BookEntity[]> {
         this.logger.log(`GetBooks() with params = ${JSON.stringify(filter)}`)
-            const result = await this.repository.query('select b.title, b.description,0 category, b.price, b.id, ab.authorid from book as b left join authorinbook as ab on ab.bookid = b.id order by id')
-            const books = Array<BookEntity>()
-            let currentId = result[0].id
-            let author;
-            let authors = new Array<AuthorEntity>()
-            let book = new BookEntity()
-            let currentBook = new BookEntity();
-            for (let i = 0; i < result.length; i++) {
-                if (currentId !== result[i].id) {
-                    authors = new Array<AuthorEntity>()
-                    book = currentBook
-                    books.push(currentBook)
-                    currentId = result[i].id
-                }
-                if (result[i].authorid) {
-                    author = await this.authorRepository.findOne({ id: result[i].authorid })
-                    authors.push(author)
-                }
-                currentBook = {
-                    id: result[i].id,
-                    title: result[i].title,
-                    authors: authors,
-                    removed_at: result[i].removed_at,
-                    description: result[i].description,
-                    price: result[i].price,
-                    cover_image: result[i].cover_image,
-                    currency: result[i].currency
-                }
+        const take = filter.pageSize;
+        const skip = (filter.pageNumber - 1) * filter.pageSize;
+        const result = await this.repository.query(
+            `select b.title, b.description, b.category, b.price, b.id, ab.authorid from book as b left join authorinbook as ab on ab.bookid = b.id where removed_at = 0 order by id LIMIT ${take} OFFSET ${skip}`
+            )
+        const books = Array<BookEntity>()
+        let currentId = result[0].id
+        let author;
+        let authors = new Array<AuthorEntity>()
+        let book = new BookEntity()
+        let currentBook = new BookEntity();
+        for (let i = 0; i < result.length; i++) {
+            if (currentId !== result[i].id) {
+                authors = new Array<AuthorEntity>()
+                book = currentBook
+                books.push(currentBook)
+                currentId = result[i].id
             }
-            return books;
+            if (result[i].authorid) {
+                author = await this.authorRepository.findOne({ id: result[i].authorid })
+                authors.push(author)
+            }
+            currentBook = {
+                id: result[i].id,
+                title: result[i].title,
+                authors: authors,
+                removed_at: result[i].removed_at,
+                description: result[i].description,
+                price: result[i].price,
+                category: result[i].category,
+                cover_image: result[i].cover_image,
+                currency: result[i].currency
+            }
+            if (i === result.length -1) {
+                books.push(currentBook)
+            }
         }
+        return books;
+    }
+
+    async Remove(id: number): Promise<boolean> {
+        const book = await this.repository.findOne(id)
+        if (!book) {
+            return false
+        }
+        const result = await this.repository.query(`UPDATE book SET removed_at = 1 where id=${id}`)
+        if (!result.changedRows) {
+            return false
+        }
+        return true
+    }
 }

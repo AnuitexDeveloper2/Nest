@@ -22,6 +22,9 @@ export class BookEntity extends BaseEntity {
     @Column({default: Currency.USD})
     currency: Currency
 
+    @Column({default: Category.Book})
+    category: Category
+    
     @OneToMany(()=> AuthorInBook, b=> b.bookId)
     authors: AuthorEntity[]
 

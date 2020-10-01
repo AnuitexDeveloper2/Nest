@@ -16,10 +16,11 @@ export class AuthorController {
     }
 
     @Post()
-    @UseGuards(JWTAuthGuard)
+    // @UseGuards(JWTAuthGuard)
     async getAuthors(@Body() filter: BaseFilter) {
        const data = await this.service.getAuthors(filter)
-       return await {data: data, count: data.length} 
+       return await 
+       {data: data, count: data.length} 
     }
     @Post('get')
     @UseGuards(JWTAuthGuard)
