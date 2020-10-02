@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthorEntity } from 'src/entities/author.entity';
-import { AuthorInBook } from 'src/entities/authorInBook.entity';
 import { BookEntity } from 'src/entities/book.entity';
 import { UserEntity } from 'src/entities/user.entity';
 import { LoggerModule } from 'src/shared/logger/logger.module';
@@ -14,7 +13,7 @@ import { AdminUserService } from './users/admin.user.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([BookEntity,AuthorEntity,UserEntity, AuthorInBook]),
+    TypeOrmModule.forFeature([BookEntity,AuthorEntity,UserEntity/*, AuthorInBook*/]),
     LoggerModule
   ],
   controllers: [AdminUserController, BooksController, AuthorController],

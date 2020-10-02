@@ -15,7 +15,7 @@ export class AdminBooksController {
     }
 
     @Post()
-    // @UseGuards(JWTAuthGuard)
+    @UseGuards(JWTAuthGuard)
     async GetBooks(@Body() filter: BaseFilter) {
         const data = await this.service.GetBooks(filter)
         return { data: data, count: data.length }

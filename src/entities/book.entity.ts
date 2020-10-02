@@ -1,31 +1,30 @@
 import { Category, Currency } from "src/shared/enums";
-import { Column, Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany } from "typeorm";
 import { AuthorEntity } from "./author.entity";
-import { AuthorInBook } from "./authorInBook.entity";
 import { BaseEntity } from "./base";
 
 @Entity('Book')
-export class BookEntity extends BaseEntity {
+export class BookEntity extends BaseEntity{
 
     @Column()
-    title: string;
+    title: string
 
-    @Column()
-    description: string;
+    @Column('text')
+    description: string
     
-    @Column()
-    cover_image: string;
+    @Column('double')
+    price: number
 
-    @Column()
-    price: number;
+    @Column({default: Category.Book})
+    category: Category
+
+    @Column('text')
+    cover_image: string
 
     @Column({default: Currency.USD})
     currency: Currency
 
-    @Column({default: Category.Book})
-    category: Category
-    
-    @OneToMany(()=> AuthorInBook, b=> b.bookId)
+    @ManyToMany(type => AuthorEntity, author => author.books,{cascade:true})
+    @JoinTable()
     authors: AuthorEntity[]
-
 }

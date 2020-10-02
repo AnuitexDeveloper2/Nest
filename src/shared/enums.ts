@@ -29,10 +29,10 @@ export enum UserFilterType {
     All = 0,
     Active = 1,
     Blocked = 2,
-  }
+}
 
 export enum Role {
     Admin = 0,
-    User =1
+    User = 1
 }
-  
+
