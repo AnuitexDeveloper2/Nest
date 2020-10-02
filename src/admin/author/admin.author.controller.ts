@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Post, Put, UseGuards, Param } from "@nestjs/common";
 import { JWTAuthGuard } from "src/account/authentication/authGuard";
 import { AuthorEntity } from "src/entities/author.entity";
 import { BaseFilter } from "src/interfaces/filters/baseFilter";
@@ -10,7 +10,7 @@ export class AuthorController {
     constructor(private readonly service: AuthorService) { }
 
     @Post('create')
-    @UseGuards(JWTAuthGuard)
+    @UseGuards(new JWTAuthGuard(Role.Admin))
     async create(@Body() author: AuthorEntity ) {
         const result = await this.service.create(author);
         return result
@@ -24,9 +24,22 @@ export class AuthorController {
        return await data
     }
     @Post('get')
-    @UseGuards(JWTAuthGuard)
+    @UseGuards(new JWTAuthGuard(Role.Admin))
     async getAllAuthors() {
         const result = await this.service.getAllAuthors()
+        return result
+    }
+
+    @Put()
+    @UseGuards(new JWTAuthGuard(Role.Admin))
+    async Update(@Body()author: AuthorEntity) {
+        return await this.service.Update(author)
+    }
+
+    @Delete(':id')
+    // @UseGuards(new JWTAuthGuard(Role.Admin))
+    async Delete(@Param('id') id: number) {
+        const result = this.service.Remove(id)
         return result
     }
 }

@@ -29,7 +29,7 @@ export class AuthorService {
         const skip = (filter.pageNumber - 1) * filter.pageSize;
 
         const authors = await this.repository.createQueryBuilder("author")
-            .leftJoinAndSelect("author.books", "book").take(take).skip(skip).getMany()
+            .leftJoinAndSelect("author.books", "book").where('author.removed_at = 0').take(take).skip(skip).getMany()
         // let authors = this.repository.find({ relations: ['books'],skip:skip,take:take })
         const count = await this.repository.count()
         return { data: authors, count: count };
@@ -38,5 +38,22 @@ export class AuthorService {
     async getAllAuthors(): Promise<AuthorEntity[]> {
         const result = await this.repository.query('SELECT * FROM author')
         return result
+    }
+
+    async Update(author: AuthorEntity): Promise<AuthorEntity> {
+        this.logger.log(`UpdateAuthor() with params = ${JSON.stringify(author)}`)
+        const result = await this.repository.save(author)
+        return result
+    }
+
+    async Remove(id: number): Promise<boolean> {
+        this.logger.log(`RmoveAuthor() with id = ${JSON.stringify(id)}`)
+        const author = await this.repository.findOne(id)
+        author.removed_at = true;
+        const result = await this.repository.save(author)
+        if (!result) {
+            return false
+        }
+        return true
     }
 }
