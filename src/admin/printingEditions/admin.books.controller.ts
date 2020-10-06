@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { JWTAuthGuard } from "src/account/authentication/authGuard";
 import { BookEntity } from "src/entities/book.entity";
 import { BaseFilter } from "src/interfaces/filters/baseFilter";
@@ -19,19 +19,20 @@ export class AdminBooksController {
     @UseGuards(new JWTAuthGuard(Role.Admin))
     async GetBooks(@Body() filter: BaseFilter) {
         const data = await this.service.GetBooks(filter)
-        return { data: data, count: data.length }
+        return data
     }
 
-    @Post('remove')
+    @Delete(':id')
     @UseGuards(new JWTAuthGuard(Role.Admin))
-    async GetBook(@Body() id) {
-        const result = await this.service.Remove(id.id)
+    async Remove(@Param('id') id: number) {
+        const result = await this.service.Remove(id)
         return result
     }
 
-
+    @Put()
     async UpdateBook(@Body() book: BookEntity) {
-
+        const result = this.service.Update(book)
+        return result;
     }
 
 } 

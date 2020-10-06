@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { AuthorEntity } from "src/entities/author.entity";
 import { BookEntity } from "src/entities/book.entity";
 import { BaseFilter } from "src/interfaces/filters/baseFilter";
+import { ResponseData } from "src/interfaces/filters/responceData";
 import { MyLogger } from "src/shared/logger/logger";
 import { Repository } from "typeorm";
 
@@ -30,15 +31,32 @@ export class BookService {
         return true
     }
 
-    async GetBooks(filter: BaseFilter): Promise<BookEntity[]> {
+    async GetBooks(filter: BaseFilter): Promise<ResponseData<BookEntity>> {
         this.logger.log(`GetBooks() with params = ${JSON.stringify(filter)}`)
         const take = filter.pageSize;
         const skip = (filter.pageNumber - 1) * filter.pageSize;
-        const books = this.repository.find({ relations: ['authors'] })
-        return books;
+        let search = ''
+        if (filter.searchString) {
+
+        }
+
+        const books = await this.repository
+            .createQueryBuilder('book')
+            .leftJoinAndSelect('book.authors', 'author', 'author.removed_at = 0')
+            .where('book.removed_at = 0')
+            .take(take)
+            .skip(skip)
+            .getManyAndCount()
+
+        const result: ResponseData<BookEntity> = {
+            data: books[0],
+            count: books[1]
+        }
+        return result;
     }
 
     async Remove(id: number): Promise<boolean> {
+        this.logger.log(`RemoveBooks() with id = ${id}`)
         const book = await this.repository.findOne(id)
         if (!book) {
             return false
@@ -47,6 +65,25 @@ export class BookService {
         if (!result.changedRows) {
             return false
         }
+        return true
+    }
+
+    async Update(bookParam: BookEntity): Promise<boolean> {
+        this.logger.log(`UpdateBook() with params = ${JSON.stringify(bookParam)}`)
+        const authors = new Array<AuthorEntity>()
+        for (let i = 0; i < bookParam.authors.length; i++) {
+            const author = await this.authorRepository.findOne({ id: bookParam.authors[i].id })
+            if (author) {
+                authors.push(author)
+            }
+        }
+        bookParam.authors = authors
+        try {
+            const book = await this.repository.save(bookParam)
+        } catch (error) {
+
+        }
+
         return true
     }
 }
