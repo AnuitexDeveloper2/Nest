@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { JWTStrategy } from './authentication/jwtStrategy';
 import { Request, Response } from 'express';
@@ -12,7 +12,7 @@ export class AccountController {
   }
 
   @Post('login')
-  async SignIn(@Body() body:any) {
+  async SignIn(@Body() body: any) {
     return await this.service.signInORM(body.email, body.password)
   }
 
@@ -20,5 +20,10 @@ export class AccountController {
   async RefreshToken(@Req() request: Request, response: Response) {
     const tokens = this.jwtStrategy.CheckRefreshToken(request)
     return tokens;
+  }
+
+  @Get(':email')
+  async ForgotPassword(@Param('email') email: string) {
+    return await this.service.ForgotPassword(email)
   }
 }

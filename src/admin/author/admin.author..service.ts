@@ -17,6 +17,7 @@ export class AuthorService {
 
     async create(author: AuthorEntity) {
         this.logger.log(`createAuthor with params ${JSON.stringify(author)}`)
+        author.createdDate = new Date()
         const result = await this.repository.save(author);
         if (!result) {
             return false;

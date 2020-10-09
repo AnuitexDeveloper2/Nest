@@ -12,6 +12,8 @@ import { JWTStrategy } from './authentication/jwtStrategy';
 import { MyLogger } from 'src/shared/logger/logger';
 import { json } from 'express';
 import { Role } from 'src/shared/enums';
+import { generatePassword } from 'src/shared/helpers/generatePassword';
+import { sendingEmail, sendingPassword } from 'src/shared/helpers/emailSender';
 
 @Injectable()
 export class AccountService {
@@ -35,6 +37,7 @@ export class AccountService {
         }
         const salt = genSaltSync(10);
         user.passwordHash = hashSync(user.passwordHash, salt);
+        user.createdDate = new Date()
         try {
 
             const newUser = await this.repository.save(user)
@@ -63,5 +66,28 @@ export class AccountService {
     async GetByEmail(email: string): Promise<UserEntity | null> {
         const user = await this.repository.findOne({ email: email })
         return user ? user : null
+    }
+
+    async ForgotPassword(email: string): Promise<boolean> {
+        this.logger.log(`ForgotPassword() with params = ${email}`)
+        const user = await this.GetByEmail(email)
+        if (!user) {
+            return false
+        }
+
+        const password = generatePassword()
+        const result = sendingPassword(user,password)
+
+        if (!result) {
+            return false
+        }
+        const salt = genSaltSync(10);
+        user.passwordHash = hashSync(password, salt);
+        const saveResult = await this.repository.save(user)
+        if (!saveResult) {
+            return false
+        }
+        return true
+        
     }
 }

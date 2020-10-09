@@ -7,6 +7,6 @@ export class BaseEntity {
     @Column({default: false})
     removed_at: boolean
 
-    @Column('varchar',{default: Date.now().toString()})
+    @Column('date')
     createdDate?: Date 
 }

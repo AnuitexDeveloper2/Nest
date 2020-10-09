@@ -19,4 +19,15 @@ export class AdminUserService {
         const res = await this.repository.query(`SELECT * FROM user WHERE user.role <> 0 LIMIT ${take} OFFSET ${skip}`);
         return await res
     }
+
+    async BlockUser(id: number) {
+        const user = await this.repository.findOne(id)
+        user.status = !user.status
+        const result = await this.repository.save(user)
+        if (!result) {
+            return false
+        }
+
+        return true
+    }
 }

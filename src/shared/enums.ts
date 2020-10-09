@@ -36,3 +36,13 @@ export enum Role {
     User = 1
 }
 
+export enum OrderStatusType {
+    Unpaid = 0,
+    Paid = 1
+}
+
+export enum PrintingEditionSortType {
+    Id = 0,
+    Price = 1,
+    Title = 2,
+  }

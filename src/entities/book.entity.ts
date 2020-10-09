@@ -1,7 +1,8 @@
 import { Category, Currency } from "src/shared/enums";
-import { Column, Entity, JoinTable, ManyToMany } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
 import { AuthorEntity } from "./author.entity";
 import { BaseEntity } from "./base";
+import { OrderItemEntity } from "./orderItem.entity";
 
 @Entity('Book')
 export class BookEntity extends BaseEntity{
