@@ -26,4 +26,9 @@ export class AccountController {
   async ForgotPassword(@Param('email') email: string) {
     return await this.service.ForgotPassword(email)
   }
+
+  @Post('confirmedEmail')
+  async ConfirmedEmail(@Body() id: number) {
+      return await this.service.ConfirmEmail(id)
+  }
 }

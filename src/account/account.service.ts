@@ -1,5 +1,5 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { compareSync, genSaltSync, hash, hashSync } from 'bcrypt';
+import { Injectable } from '@nestjs/common';
+import { genSaltSync, hashSync } from 'bcrypt';
 //for MongoDB
 
 //for MySQL
@@ -10,10 +10,8 @@ import { ResponseModel } from 'src/interfaces/responceModel';
 import { LocalStrategy } from './authentication/local.strategy';
 import { JWTStrategy } from './authentication/jwtStrategy';
 import { MyLogger } from 'src/shared/logger/logger';
-import { json } from 'express';
-import { Role } from 'src/shared/enums';
 import { generatePassword } from 'src/shared/helpers/generatePassword';
-import { sendingEmail, sendingPassword } from 'src/shared/helpers/emailSender';
+import { sendingPassword } from 'src/shared/helpers/emailSender';
 
 @Injectable()
 export class AccountService {
@@ -88,6 +86,18 @@ export class AccountService {
             return false
         }
         return true
-        
+    }
+
+    async ConfirmEmail(id: number): Promise<boolean> {
+        const user = await this.repository.findOne(id)
+        if (!user) {
+            return false
+        }
+        user.confirmedEmail = true
+        const result = this.repository.save(user)
+        if (!result) {
+            return false
+        }
+        return true
     }
 }

@@ -5,7 +5,7 @@ import { BookEntity } from "src/entities/book.entity";
 import { BaseFilter } from "src/interfaces/filters/baseFilter";
 import { ResponseData } from "src/interfaces/filters/responceData";
 import { MyLogger } from "src/shared/logger/logger";
-import { getRepository, QueryBuilder, Repository, SelectQueryBuilder } from "typeorm";
+import { getRepository, Like, QueryBuilder, Repository, SelectQueryBuilder } from "typeorm";
 
 @Injectable()
 export class AuthorService {
@@ -29,15 +29,26 @@ export class AuthorService {
         this.logger.log(`getAuthors with params ${JSON.stringify(filter)}`)
         const take = filter.pageSize;
         const skip = (filter.pageNumber - 1) * filter.pageSize;
-
-        const authors = await this.repository.createQueryBuilder("author")
-            .leftJoinAndSelect("author.books", "book", "book.removed_at = 0").where('author.removed_at = 0').take(take).skip(skip).getManyAndCount()
-        // let authors = this.repository.find({ relations: ['books'],skip:skip,take:take })
-        const result: ResponseData<AuthorEntity> = {
-            data: authors[0],
-            count: authors[1]
+        const sortColumn = filter.sortType === 0? 'id': "name"
+        const sortType = filter.sortType === -1? "DESC": "ASC"
+        try {
+            
+            const authors = await this.repository.createQueryBuilder("author")
+            .leftJoinAndSelect("author.books", "book", "book.removed_at = 0")
+            .where({'name': Like(`%${filter.searchString}%`)})
+            .andWhere('author.removed_at = 0')
+            .orderBy(`author.${sortColumn}`,sortType)
+            .take(take)
+            .skip(skip)
+            .getManyAndCount()
+            const result: ResponseData<AuthorEntity> = {
+                data: authors[0],
+                count: authors[1]
+            }
+            return result
+        } catch (error) {
+          console.log(error)  
         }
-        return result
     }
 
     async getAllAuthors(): Promise<AuthorEntity[]> {

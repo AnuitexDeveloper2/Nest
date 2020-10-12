@@ -24,9 +24,14 @@ export class BookService {
         const authors = await this.authorRepository.findByIds(authorsId)
         book.authors = authors
         book.createdDate = new Date()
-        const bookSave = await this.repository.save(book)
-        if (!bookSave) {
-            return false
+        try {
+            
+            const bookSave = await this.repository.save(book)
+            if (!bookSave) {
+                return false
+            }
+        } catch (error) {
+            
         }
 
         return true
