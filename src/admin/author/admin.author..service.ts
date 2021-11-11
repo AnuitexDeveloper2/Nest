@@ -29,13 +29,13 @@ export class AuthorService {
         this.logger.log(`getAuthors with params ${JSON.stringify(filter)}`)
         const take = filter.pageSize;
         const skip = (filter.pageNumber - 1) * filter.pageSize;
+        const search = filter.searchString? {'name': Like(`%${filter.searchString}%`)}: ''
         const sortColumn = filter.sortType === 0? 'id': "name"
         const sortType = filter.sortType === -1? "DESC": "ASC"
         try {
-            
             const authors = await this.repository.createQueryBuilder("author")
             .leftJoinAndSelect("author.books", "book", "book.removed_at = 0")
-            .where({'name': Like(`%${filter.searchString}%`)})
+            .where(search)
             .andWhere('author.removed_at = 0')
             .orderBy(`author.${sortColumn}`,sortType)
             .take(take)
@@ -66,7 +66,7 @@ export class AuthorService {
     }
 
     async Remove(id: number): Promise<boolean> {
-        this.logger.log(`RmoveAuthor() with id = ${JSON.stringify(id)}`)
+        this.logger.log(`RemoveAuthor() with id = ${JSON.stringify(id)}`)
         const author = await this.repository.findOne(id)
         author.removed_at = true;
         const result = await this.repository.save(author)

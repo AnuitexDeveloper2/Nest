@@ -5,7 +5,7 @@ import { BookEntity } from "src/entities/book.entity";
 import { BaseFilter } from "src/interfaces/filters/baseFilter";
 import { ResponseData } from "src/interfaces/filters/responceData";
 import { MyLogger } from "src/shared/logger/logger";
-import { Repository } from "typeorm";
+import { Like, Repository } from "typeorm";
 
 
 @Injectable()
@@ -25,13 +25,13 @@ export class BookService {
         book.authors = authors
         book.createdDate = new Date()
         try {
-            
+
             const bookSave = await this.repository.save(book)
             if (!bookSave) {
                 return false
             }
         } catch (error) {
-            
+
         }
 
         return true
@@ -41,15 +41,13 @@ export class BookService {
         this.logger.log(`GetBooks() with params = ${JSON.stringify(filter)}`)
         const take = filter.pageSize;
         const skip = (filter.pageNumber - 1) * filter.pageSize;
-        let search = ''
-        if (filter.searchString) {
-
-        }
+        const search = filter.searchString ? { 'title': Like(`%${filter.searchString}%`) } : ''
 
         const books = await this.repository
             .createQueryBuilder('book')
             .leftJoinAndSelect('book.authors', 'author', 'author.removed_at = 0')
-            .where('book.removed_at = 0')
+            .where(search)
+            .andWhere('book.removed_at = 0')
             .take(take)
             .skip(skip)
             .getManyAndCount()
@@ -87,9 +85,7 @@ export class BookService {
         try {
             const book = await this.repository.save(bookParam)
         } catch (error) {
-
         }
-
         return true
     }
 }

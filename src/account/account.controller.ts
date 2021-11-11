@@ -31,4 +31,9 @@ export class AccountController {
   async ConfirmedEmail(@Body() id: number) {
       return await this.service.ConfirmEmail(id)
   }
+
+  @Post()
+  async SignInSocial() {
+    
+  }
 }
